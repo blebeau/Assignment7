@@ -9,8 +9,128 @@ and open the template in the editor.
         <title>Product</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+        <!-- From https://angularjs.org/ -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.7/angular.min.js"></script>
+        <script>
+            var pcApp = angular.module('pcApp', []);
+            pcApp.controller('productCtrl', function($scope, $http) {
+                var baseUrl = '/CSD4464-JAX-RS-2019W/api/productCode';
+                $scope.productList = [];
+                function getItems() {
+                    $http.get(baseUrl).then(
+                        function(products){
+                            $scope.productList = products.data;
+                        },
+                        function(error){
+                            alert(error.message);
+                        });
+                }
+                getItems();
+                $scope.addItem = function() {
+                    newProduct = {
+                        prod: $scope.newProdId,
+                        discount: $scope.newManufacturerId,
+                        description: $scope.newProdCode,
+                    }
+                    $http.post(baseUrl, newProduct).then(
+                        function() {
+                            // Timeout needed because updates happen too fast
+                            setTimeout(getItems(), 500);
+                        },
+                        function(error){
+                            alert(error.message);
+                        }
+                    );
+                };
+                
+                $scope.editItem = function() {
+                    editProduct = {
+                       prod: $scope.editProdId,
+                        discount: $scope.editManufacturerId,
+                        description: $scope.editProdCode,
+                    };
+                    $http.put(baseUrl + '/' + $scope.editProdId, editProduct).then(
+                        function() {
+                            setTimeout(getItems(), 500);
+                        },
+                        function(error){
+                            alert(error.message);
+                        }
+                    );
+                };
+                
+                $scope.delItem = function() {                    
+                    $http.delete(baseUrl + '/' + $scope.delProdId).then(
+                        function() {
+                            setTimeout(getItems(), 500);
+                        },
+                        function(error){
+                            alert(error.message);
+                        }
+                    );
+                };
+            });
+        </script>
     </head>
     <body>
-        <div>TODO write content</div>
+        <div ng-app="pcApp" class="container">
+            <div class="row" ng-controller="productCtrl">
+                <div class="col-md-6">
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Product </th>
+                                <th>Manufacturer Id</th>
+                                <th>Product Code</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-table">
+                            <tr ng-repeat="product in productList">
+                                <td>{{ product.prodId }}</td>
+                                <td>{{ product.manufacturerId }}</td>
+                                <td>{{ product.prodCode }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h1>Add Product</h1>
+                    <div class="form-group">
+                        <label>Product <input class="form-control" ng-model="newProd" /></label>
+                    </div>
+                    <div class="form-group">
+                        <label><input class="form-control" ng-model="" /></label>
+                    </div>
+                    <div class="form-group">
+                        <label>Description <input class="form-control" ng-model="newDescription" /></label>
+                    </div>
+                    <button class="btn btn-success" ng-click="addItem()">Add</button>
+                    
+                    <h1>Edit Product</h1>
+                    <div class="form-group">
+                        <label>Product<input class="form-control" ng-model="editProd" /></label>
+                    </div>
+                    <div class="form-group">
+                        <label> <input class="form-control" ng-model="" /></label>
+                    </div>
+                    <div class="form-group">
+                        <label> <input class="form-control" ng-model="edit" /></label>
+                    </div>
+                    <button class="btn btn-warning" ng-click="editItem()">Edit</button>
+                    
+                    <h1>Delete Product</h1>
+                    <div class="form-group">
+                        <label>Product<input class="form-control" ng-model="delProd" /></label>
+                    </div>
+                    <button class="btn btn-danger" ng-click="delItem()">Delete</button>
+
+                </div>
+            </div>
+        </div>
     </body>
 </html>
