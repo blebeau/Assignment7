@@ -38,6 +38,7 @@ public class ApplicationConfig extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> result = new HashSet<>();
         result.add(ProductCodeREST.class);
+        result.add(Manufacturer.class);
         return result;
     }
 }

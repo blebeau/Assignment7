@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Manufacturer</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- From https://getbootstrap.com/ -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+        <!-- From https://angularjs.org/ -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.7/angular.min.js"></script>
+        <script>
+            var pcApp = angular.module('pcApp', []);
+            pcApp.controller('manufacturerCtrl', function($scope, $http) {
+                var baseUrl = '/CSD4464-JAX-RS-2019W/api/manufacturer';
+                $scope.manufacturerList = [];
+                function getItems() {
+                    $http.get(baseUrl).then(
+                        function(manufacturer){
+                            $scope.manufacturerList = manufacturer.data;
+                        },
+                        function(error){
+                            alert(error.message);
+                        });
+                }
+                getItems();
+                $scope.addItem = function() {
+                    newManufacturer = {
+                        manufacturerId: $scope.newManufacturerId,
+                        manufacturerName: $scope.newManufacturerName,
+                    }
+                    $http.post(baseUrl, newManufacturer).then(
+                        function() {
+                            // Timeout needed because updates happen too fast
+                            setTimeout(getItems(), 500);
+                        },
+                        function(error){
+                            alert(error.message);
+                        }
+                    );
+                };
+                
+                $scope.editItem = function() {
+                    editManufacturer = {
+                        manufacturerId: $scope.newManufacturerId,
+                        manufacturerName: $scope.newManufacturerName,
+                    };
+                    $http.put(baseUrl + '/' + $scope.editManufacturerId, editManufacturer).then(
+                        function() {
+                            setTimeout(getItems(), 500);
+                        },
+                        function(error){
+                            alert(error.message);
+                        }
+                    );
+                };
+                
+                $scope.delItem = function() {                    
+                    $http.delete(baseUrl + '/' + $scope.delManufacturerId).then(
+                        function() {
+                            setTimeout(getItems(), 500);
+                        },
+                        function(error){
+                            alert(error.message);
+                        }
+                    );
+                };
+            });
+        </script>
+    </head>
+    <body>
+        <div ng-app="pcApp" class="container">
+            <div class="row" ng-controller="manufacturerCtrl">
+                <div class="col-md-6">
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Manufacturer_id</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-table">
+                            <tr ng-repeat="manufacturer in manufacturerList">
+                                <td>{{manufacturer.manufacturer_id}}</td>
+                                <td>{{manufacturer.Name}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h1>Add Manufacturer</h1>
+                    <div class="form-group">
+                        <label>Manufacturer id<input class="form-control" ng-model="newManufacturerId" /></label>
+                    </div>
+                    <div class="form-group">
+                        <label>manufacturer name<input class="form-control" ng-model="newManufacturerName" /></label>
+                    </div>
+<!--                    <div class="form-group">
+                        <label>Description <input class="form-control" ng-model="newDescription" /></label>
+                    </div>-->
+                    <button class="btn btn-success" ng-click="addItem()">Add</button>
+                    
+                    <h1>Edit Manufacturer</h1>
+                    <div class="form-group">
+                        <label>Product Code <input class="form-control" ng-model="editManufacturerId" /></label>
+                    </div>
+                    <div class="form-group">
+                        <label>Discount Code <input class="form-control" ng-model="editManufacturerName" /></label>
+                    </div>
+<!--                    <div class="form-group">
+                        <label>Description <input class="form-control" ng-model="editDescription" /></label>
+                    </div>-->
+                    <button class="btn btn-warning" ng-click="editItem()">Edit</button>
+                    
+                    <h1>Delete Manufacturer</h1>
+                    <div class="form-group">
+                        <label>Product Code <input class="form-control" ng-model="delManufacturer" /></label>
+                    </div>
+                    <button class="btn btn-danger" ng-click="delItem()">Delete</button>
+
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>
